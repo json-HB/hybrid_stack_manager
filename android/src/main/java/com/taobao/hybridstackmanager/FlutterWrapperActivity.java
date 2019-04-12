@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -108,19 +109,24 @@ public class FlutterWrapperActivity extends Activity implements PluginRegistry,V
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        boolean firstLaunch = (nativeView==null?true:false);
+        boolean firstLaunch = nativeView == null ? true : false;
 
         super.onCreate(savedInstanceState);
         checkIfInitActivityDelegate();
         eventDelegate.onCreate(savedInstanceState);
 
-        if(firstLaunch){
+        // hide status bar background
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(0x00000000);
+        }
+
+        if (firstLaunch) {
             eventDelegate.runFlutterBundle();
             Class<?> c = null;
             try {
                 c = Class.forName("io.flutter.plugins.GeneratedPluginRegistrant");
-                Method method = c.getMethod("registerWith",PluginRegistry.class);
-                method.invoke(null,pluginRegistry);
+                Method method = c.getMethod("registerWith", PluginRegistry.class);
+                method.invoke(null, pluginRegistry);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (NoSuchMethodException e) {
@@ -130,27 +136,25 @@ public class FlutterWrapperActivity extends Activity implements PluginRegistry,V
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
-        }
-        else{
+        } else {
             try {
                 flutterView.registerReceiver();
-            }catch (Exception e){
+            } catch (Exception e) {
                 Log.e( "FlutterWrapperActivity ","onCreate flutterView.registerReceiver error" );
             }
         }
         setContentView(R.layout.flutter_layout);
         checkIfAddFlutterView();
-        fakeSnapImgView = (ImageView) findViewById(R.id.flutter_snap_imageview);
+        fakeSnapImgView = (ImageView)findViewById(R.id.flutter_snap_imageview);
         fakeSnapImgView.setVisibility(View.GONE);
         //Process Intent Extra
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         Uri uri = intent.getData();
-        if(uri!=null){
-            HybridStackManager.sharedInstance().openUrlFromFlutter(uri.toString(),null,null);
-        }
-        else if(bundle!=null){
-            HybridStackManager.sharedInstance().openUrlFromFlutter(intent.getStringExtra("url"),(HashMap)intent.getSerializableExtra("query"),(HashMap)intent.getSerializableExtra("params"));
+        if (uri != null) {
+            HybridStackManager.sharedInstance().openUrlFromFlutter(uri.toString(), null, null);
+        } else if (bundle != null) {
+            HybridStackManager.sharedInstance().openUrlFromFlutter(intent.getStringExtra("url"), (HashMap)intent.getSerializableExtra("query"), (HashMap)intent.getSerializableExtra("params"));
         }
         flutterWrapperInstCnt++;
     }
@@ -313,29 +317,25 @@ public class FlutterWrapperActivity extends Activity implements PluginRegistry,V
         return isActive;
     }
 
-    public void openUrl(String url) {
+    public void openUrl(String url, HashMap query, HashMap params) {
         HybridStackManager.sharedInstance().curFlutterActivity = null;
-        if(url.contains("flutter=true")){
-            Intent intent = new Intent(FlutterWrapperActivity.this, FlutterWrapperActivity.class);
-            intent.setAction(Intent.ACTION_RUN);
-            intent.setData(Uri.parse(url));
-            this.innerStartActivity(intent,true);
-        }
-        else{
-            Uri tmpUri = Uri.parse(url);
-            String tmpUrl = String.format("%s://%s",tmpUri.getScheme(),tmpUri.getHost());
-            HashMap query = new HashMap();
-            for(String key : tmpUri.getQueryParameterNames()){
-                query.put(key,tmpUri.getQueryParameter(key));
-            }
-            XURLRouter.sharedInstance().openUrlWithQueryAndParams(tmpUrl,query,null);
+        Uri tmpUri = Uri.parse(url);
+        if ("native".equals(tmpUri.getHost())) {
+            XURLRouter.sharedInstance().openUrlWithQueryAndParams(url, query, params);
             saveFinishSnapshot(false);
+        } else {
+            Intent intent = new Intent(FlutterWrapperActivity.this, FlutterWrapperActivity.class);
+            // intent.setAction(Intent.ACTION_RUN);
+            intent.putExtra("url", url);
+            intent.putExtra("query", query);
+            intent.putExtra("params", params);
+            this.innerStartActivity(intent);
         }
     }
 
-    public void innerStartActivity(Intent intent,boolean showSnapshot){
+    public void innerStartActivity(Intent intent){
         this.startActivity(intent);
-        saveFinishSnapshot(showSnapshot);
+        saveFinishSnapshot(true);
     }
 
 

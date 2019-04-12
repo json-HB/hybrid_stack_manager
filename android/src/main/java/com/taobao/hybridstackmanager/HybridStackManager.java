@@ -1,5 +1,6 @@
 package com.taobao.hybridstackmanager;
 import android.net.Uri;
+import android.app.Activity;
 
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ public class HybridStackManager implements MethodCallHandler {
     public static HashMap assembleChanArgs(String url, HashMap query, HashMap params) {
         HashMap arguments = new HashMap();
         Uri uri = Uri.parse(url);
-        String tmpUrl = String.format("%s://%s", uri.getScheme(), uri.getHost());
+        String tmpUrl = url.split("\\?")[0];
         HashMap tmpQuery = new HashMap();
         if (query != null) { tmpQuery.putAll(query); }
         for (String key : uri.getQueryParameterNames()) {
@@ -48,7 +49,7 @@ public class HybridStackManager implements MethodCallHandler {
         }
 
         HashMap tmpParams = new HashMap();
-        if (params != null) { tmpQuery.putAll(params); }
+        if (params != null) { tmpParams.putAll(params); }
 
         if (tmpUrl != null) { arguments.put("url", tmpUrl); }
         if (tmpQuery != null) { arguments.put("query", tmpQuery); }
@@ -56,38 +57,32 @@ public class HybridStackManager implements MethodCallHandler {
         return arguments;
     }
 
-    public static String concatUrl(String url, HashMap query, HashMap params) {
-        // assert(params==null||params.size()==0);
-        Uri uri = Uri.parse(url);
-        Uri.Builder builder = uri.buildUpon();
-        if (query != null) {
-            for (Object key : query.keySet()) {
-                Object value = query.get(key);
-                if (value != null) {
-                    final String str;
-                    str = value.toString();
-                    builder.appendQueryParameter(String.valueOf(key),str);
-                }
-            }
-        }
-        return builder.build().toString();
-    }
-
     public void openUrlFromFlutter(String url, HashMap query, HashMap params) {
         HybridStackManager.sharedInstance().methodChannel.invokeMethod("openURLFromFlutter",
             assembleChanArgs(url, query, params));
     }
 
+    public void callFlutterMethod(String method, HashMap args) {
+      HybridStackManager.sharedInstance().methodChannel.invokeMethod(method, args);
+    }
+
     @Override
     public void onMethodCall(MethodCall call, Result result) {
-        if (call.method.equals("openUrlFromNative")) {
+        if (call.method.equals("callNativeMethod")) {
+            if (curFlutterActivity != null && curFlutterActivity.isActive()) {
+                HashMap args = (HashMap)call.arguments;
+                String method = (String)args.get("method");
+                HashMap params = (HashMap)args.get("params");
+                XURLRouter.sharedInstance().handleCallFromFlutter((Activity)curFlutterActivity, method, params);
+            }
+            result.success("OK");
+        } else if (call.method.equals("openUrlFromNative")) {
             if (curFlutterActivity != null && curFlutterActivity.isActive()) {
                 HashMap openUrlInfo = (HashMap)call.arguments;
                 String url = (String)openUrlInfo.get("url");
                 HashMap query = (HashMap)openUrlInfo.get("query");
                 HashMap params = (HashMap)openUrlInfo.get("params");
-                String concatUrl = concatUrl(url, query, params);
-                curFlutterActivity.openUrl(concatUrl);
+                curFlutterActivity.openUrl(url, query, params);
             }
             result.success("OK");
         } else if (call.method.equals("getMainEntryParams")) {
@@ -105,7 +100,7 @@ public class HybridStackManager implements MethodCallHandler {
                 curFlutterActivity.popCurActivity();
             }
             result.success("OK");
-        }else {
+        } else {
             result.notImplemented();
         }
     }

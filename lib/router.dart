@@ -24,7 +24,8 @@ class XMaterialPageRoute<T> extends MaterialPageRoute<T> {
 class Router extends Object {
   static final Router singleton = new Router._internal();
   List<XMaterialPageRoute> flutterRootPageNameLst = new List();
-  String currentPageUrl = null;
+  Map<String, XMaterialPageRoute> _routeNameMap = new Map();
+  String currentPageUrl;
   FlutterWidgetHandler routerWidgetHandler;
   GlobalKey globalKeyForRouter;
   static Router sharedInstance() {
@@ -52,45 +53,41 @@ class Router extends Object {
         Router.sharedInstance().popToRouteNamed(methodCall.arguments);
       } else if (method == "popRouteNamed") {
         Router.sharedInstance().popRouteNamed(methodCall.arguments);
+      } else {
+        HybridStackManagerPlugin.hybridStackManagerPlugin.callFallbackHandler(methodCall);
       }
     });
   }
+
   popToRoot() {
     NavigatorState navState = Navigator.of(globalKeyForRouter.currentContext);
-    List<Route<dynamic>> navHistory = navState.history;
-    int histLen = navHistory.length;
-    for (int i = histLen - 1; i >= 1; i--) {
-      Route route = navHistory.elementAt(i);
-      navState.removeRoute(route);
-    }
+    navState.popUntil((route) {
+      if (route.isFirst) {
+        return true;
+      }
+      _routeNameMap.remove(route.settings.name);
+      return false;
+    });
   }
 
   popToRouteNamed(String routeName) {
     NavigatorState navState = Navigator.of(globalKeyForRouter.currentContext);
-    List<Route<dynamic>> navHistory = navState.history;
-    int histLen = navHistory.length;
-    for (int i = histLen - 1; i >= 1; i--) {
-      Route route = navHistory.elementAt(i);
-      if (!(route is XMaterialPageRoute) ||
-          ((route as XMaterialPageRoute).settings.name != routeName)) {
-        navState.removeRoute(route);
+    navState.popUntil((route) {
+      if (!(route is XMaterialPageRoute)) {
+        return false;
+      } else if (route.settings.name != routeName) {
+        _routeNameMap.remove(route.settings.name);
+        return false;
       }
-      if ((route is XMaterialPageRoute) &&
-          ((route as XMaterialPageRoute).settings.name == routeName)) break;
-    }
+      return true;
+    });
   }
 
   popRouteNamed(String routeName) {
     NavigatorState navState = Navigator.of(globalKeyForRouter.currentContext);
-    List<Route<dynamic>> navHistory = navState.history;
-    int histLen = navHistory.length;
-    for (int i = histLen - 1; i >= 1; i--) {
-      Route route = navHistory.elementAt(i);
-      if ((route is XMaterialPageRoute) &&
-          ((route as XMaterialPageRoute).settings.name == routeName)) {
-        navState.removeRoute(route);
-        break;
-      }
+    XMaterialPageRoute route = _routeNameMap.remove(routeName);
+    if (route != null) {
+      navState.removeRoute(route);
     }
   }
 
@@ -105,6 +102,7 @@ class Router extends Object {
             return page;
           });
 
+      _routeNameMap[routeOption.userInfo] = pageRoute;
       Navigator.of(globalKeyForRouter.currentContext).push(pageRoute);
       HybridStackManagerPlugin.hybridStackManagerPlugin
           .updateCurFlutterRoute(routeOption.userInfo);
@@ -114,8 +112,6 @@ class Router extends Object {
           query: routeOption.query,
           params: routeOption.params);
     }
-    NavigatorState navState = Navigator.of(globalKeyForRouter.currentContext);
-    List<Route<dynamic>> navHistory = navState.history;
   }
 
   pushPageWithOptionsFromNative({RouterOption routeOption, bool animated}) {

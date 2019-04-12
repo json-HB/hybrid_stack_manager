@@ -11,7 +11,7 @@ public interface FlutterActivityChecker {
 
     public boolean isActive();
 
-    public void openUrl(String url);
+    public void openUrl(String url, HashMap query, HashMap params);
 
     public void setCurFlutterRouteName(String curFlutterRouteName);
 

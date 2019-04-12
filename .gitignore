@@ -1,8 +1,17 @@
+*.log
 .DS_Store
 .dart_tool/
+.vscode/
 
 .packages
 .pub/
 pubspec.lock
 
 build/
+
+*.iml
+.classpath
+.project
+.settings
+.gradle/
+.idea

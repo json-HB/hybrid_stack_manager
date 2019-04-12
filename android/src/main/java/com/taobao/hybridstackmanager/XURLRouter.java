@@ -2,6 +2,7 @@ package com.taobao.hybridstackmanager;
 
 import android.content.Context;
 import android.content.Intent;
+import android.app.Activity;
 import android.net.Uri;
 import java.util.HashMap;
 
@@ -22,24 +23,31 @@ public class XURLRouter {
     public void setNativeRouterHandler(XURLRouterHandler handler){
         mNativeRouterHandler = handler;
     }
-    public boolean openUrlWithQueryAndParams(String url, HashMap query, HashMap params){
+    public boolean openUrlWithQueryAndParams(String url, HashMap query, HashMap params) {
         Uri tmpUri = Uri.parse(url);
-        if(!kOpenUrlPrefix.equals(tmpUri.getScheme()))
+        if (!kOpenUrlPrefix.equals(tmpUri.getScheme())) {
             return false;
-        if(query!=null && query.containsKey("flutter") && (Boolean) query.get("flutter")){
+        }
+        if ("native".equals(tmpUri.getHost())) {
+            if (mNativeRouterHandler != null) {
+                mNativeRouterHandler.openUrlWithQueryAndParams(url, query, params);
+                return true;
+            }
+        } else {
             Intent intent = new Intent(mAppContext,FlutterWrapperActivity.class);
-            intent.setData(Uri.parse(url));
-            intent.setAction(Intent.ACTION_VIEW);
+            intent.putExtra("url", url);
+            intent.putExtra("query", query);
+            intent.putExtra("params", params);
+            // intent.setAction(Intent.ACTION_VIEW);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             mAppContext.startActivity(intent);
             return true;
         }
-        if(mNativeRouterHandler!=null) {
-            Class activityCls =  mNativeRouterHandler.openUrlWithQueryAndParams(url, query, params);
-            Intent intent = new Intent(mAppContext,activityCls);
-            intent.setData(Uri.parse(url));
-            intent.setAction(Intent.ACTION_VIEW);
-            mAppContext.startActivity(intent);
-        }
         return false;
+    }
+    public void handleCallFromFlutter(Activity activity, String method, HashMap params) {
+      if (mNativeRouterHandler != null) {
+          mNativeRouterHandler.handleCallFromFlutter(activity, method, params);
+      }
     }
 }
