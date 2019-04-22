@@ -201,7 +201,7 @@ public class FlutterWrapperActivity extends Activity implements PluginRegistry,V
 
     @Override
     public void onBackPressed() {
-        popCurActivity();
+        HybridStackManager.sharedInstance().methodChannel.invokeMethod("onBackPressed", null);
     }
 
     @Override
