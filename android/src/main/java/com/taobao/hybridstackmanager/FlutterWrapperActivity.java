@@ -331,6 +331,9 @@ public class FlutterWrapperActivity extends Activity implements PluginRegistry,V
             intent.putExtra("params", params);
             this.innerStartActivity(intent);
         }
+        if (params != null && params.get("popCurPage") != null && (Boolean) params.get("popCurPage")) {
+            finish();
+        }
     }
 
     public void innerStartActivity(Intent intent){
