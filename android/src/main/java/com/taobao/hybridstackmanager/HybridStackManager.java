@@ -1,11 +1,8 @@
 package com.taobao.hybridstackmanager;
+
+import java.util.HashMap;
 import android.net.Uri;
 import android.app.Activity;
-
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
-
 import android.os.Build;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -73,9 +70,8 @@ public class HybridStackManager implements MethodCallHandler {
                 HashMap args = (HashMap)call.arguments;
                 String method = (String)args.get("method");
                 HashMap params = (HashMap)args.get("params");
-                XURLRouter.sharedInstance().handleCallFromFlutter((Activity)curFlutterActivity, method, params);
+                XURLRouter.sharedInstance().handleCallFromFlutter((Activity)curFlutterActivity, result, method, params);
             }
-            result.success("OK");
         } else if (call.method.equals("openUrlFromNative")) {
             if (curFlutterActivity != null && curFlutterActivity.isActive()) {
                 HashMap openUrlInfo = (HashMap)call.arguments;

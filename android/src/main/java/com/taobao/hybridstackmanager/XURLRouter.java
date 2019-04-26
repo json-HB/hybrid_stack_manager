@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.app.Activity;
 import android.net.Uri;
 import java.util.HashMap;
+import io.flutter.plugin.common.MethodChannel.Result;
 
 public class XURLRouter {
     final static String kOpenUrlPrefix = "hrd";
@@ -45,9 +46,9 @@ public class XURLRouter {
         }
         return false;
     }
-    public void handleCallFromFlutter(Activity activity, String method, HashMap params) {
+    public void handleCallFromFlutter(Activity activity, Result result, String method, HashMap params) {
       if (mNativeRouterHandler != null) {
-          mNativeRouterHandler.handleCallFromFlutter(activity, method, params);
+          mNativeRouterHandler.handleCallFromFlutter(activity, result, method, params);
       }
     }
 }
