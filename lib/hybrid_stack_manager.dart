@@ -42,8 +42,8 @@ class HybridStackManagerPlugin {
     _channel.invokeMethod("popCurPage", animated);
   }
 
-  void updateCurFlutterRoute(String curRouteName) {
-    _channel.invokeMethod("updateCurFlutterRoute", curRouteName ?? "");
+  void updateCurPageFlutterRoute(String curRouteName) {
+    _channel.invokeMethod("updateCurPageFlutterRoute", curRouteName ?? "");
   }
 
   Future callNativeMethod(String method, [Map params]) async {

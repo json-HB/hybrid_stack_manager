@@ -22,6 +22,7 @@ class XMaterialPageRoute<T> extends MaterialPageRoute<T> {
 }
 
 class Router extends Object {
+  static String currentRouteName = '';
   static final Router singleton = new Router._internal();
   List<XMaterialPageRoute> flutterRootPageNameLst = new List();
   Map<String, XMaterialPageRoute> _routeNameMap = new Map();
@@ -54,7 +55,8 @@ class Router extends Object {
       } else if (method == "popRouteNamed") {
         Router.sharedInstance().popRouteNamed(methodCall.arguments);
       } else {
-        HybridStackManagerPlugin.hybridStackManagerPlugin.callFallbackHandler(methodCall);
+        HybridStackManagerPlugin.hybridStackManagerPlugin
+            .callFallbackHandler(methodCall);
       }
     });
   }
@@ -63,6 +65,7 @@ class Router extends Object {
     NavigatorState navState = Navigator.of(globalKeyForRouter.currentContext);
     navState.popUntil((route) {
       if (route.isFirst) {
+        currentRouteName = '';
         return true;
       }
       _routeNameMap.remove(route.settings.name);
@@ -79,6 +82,7 @@ class Router extends Object {
         _routeNameMap.remove(route.settings.name);
         return false;
       }
+      currentRouteName = route.settings.name;
       return true;
     });
   }
@@ -104,8 +108,9 @@ class Router extends Object {
 
       _routeNameMap[routeOption.uniqueName] = pageRoute;
       Navigator.of(globalKeyForRouter.currentContext).push(pageRoute);
+      currentRouteName = routeOption.uniqueName;
       HybridStackManagerPlugin.hybridStackManagerPlugin
-          .updateCurFlutterRoute(routeOption.uniqueName);
+          .updateCurPageFlutterRoute(routeOption.uniqueName);
     } else {
       HybridStackManagerPlugin.hybridStackManagerPlugin.openUrlFromNative(
           url: routeOption.url,

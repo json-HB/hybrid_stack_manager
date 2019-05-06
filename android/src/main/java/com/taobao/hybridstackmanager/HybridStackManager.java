@@ -85,7 +85,7 @@ public class HybridStackManager implements MethodCallHandler {
             if (mainEntryParams == null) { mainEntryParams = new HashMap(); }
             result.success(mainEntryParams);
             //      mainEntryParams = null;
-        } else if (call.method.equals("updateCurFlutterRoute")) {
+        } else if (call.method.equals("updateCurPageFlutterRoute")) {
             String curRouteName = (String)call.arguments;
             if (curFlutterActivity != null && curFlutterActivity.isActive()) {
                 curFlutterActivity.setCurFlutterRouteName(curRouteName);

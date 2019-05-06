@@ -41,7 +41,7 @@
         result(params);
         //      self.mainEntryParams = nil;
     }
-    else if([@"updateCurFlutterRoute" isEqualToString:call.method]){
+    else if([@"updateCurPageFlutterRoute" isEqualToString:call.method]){
         NSString *curRouteName = call.arguments;
         UINavigationController *rootNav = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
         UIViewController *topVC = rootNav.topViewController;
