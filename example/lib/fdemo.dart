@@ -7,7 +7,7 @@ class FDemoWidget extends StatelessWidget {
     routeOption = option;
   }
   Widget build(BuildContext context) {
-    Map m = Utils.parseUniquePageName(routeOption.userInfo);
+    Map m = Utils.parseUniquePageName(routeOption.uniqueName);
     return new Scaffold(
         appBar: new AppBar(
           leading: new GestureDetector(

@@ -96,16 +96,16 @@ class Router extends Object {
         Router.sharedInstance().pageFromOption(routeOption: routeOption);
     if (page != null) {
       XMaterialPageRoute pageRoute = new XMaterialPageRoute(
-          settings: new RouteSettings(name: routeOption.userInfo),
+          settings: new RouteSettings(name: routeOption.uniqueName),
           animated: animated,
           builder: (BuildContext context) {
             return page;
           });
 
-      _routeNameMap[routeOption.userInfo] = pageRoute;
+      _routeNameMap[routeOption.uniqueName] = pageRoute;
       Navigator.of(globalKeyForRouter.currentContext).push(pageRoute);
       HybridStackManagerPlugin.hybridStackManagerPlugin
-          .updateCurFlutterRoute(routeOption.userInfo);
+          .updateCurFlutterRoute(routeOption.uniqueName);
     } else {
       HybridStackManagerPlugin.hybridStackManagerPlugin.openUrlFromNative(
           url: routeOption.url,
@@ -126,7 +126,7 @@ class Router extends Object {
     try {
       currentPageUrl = routeOption.url + "?" + converUrl(routeOption.query);
     } catch (e) {}
-    routeOption.userInfo = Utils.generateUniquePageName(routeOption.url);
+    routeOption.uniqueName = Utils.generateUniquePageName(routeOption.url);
     if (routerWidgetHandler != null)
       return routerWidgetHandler(routeOption: routeOption, key: key);
   }

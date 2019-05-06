@@ -2,6 +2,6 @@ class RouterOption {
   String url;
   Map query;
   Map params;
-  String userInfo;
+  String uniqueName;
   RouterOption({this.url, this.query, this.params});
 }
