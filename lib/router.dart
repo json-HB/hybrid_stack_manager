@@ -35,7 +35,7 @@ class Router extends Object {
 
   Router._internal() {
     HybridStackManagerPlugin.hybridStackManagerPlugin
-        .setMethodCallHandler((MethodCall methodCall) {
+        .setMethodCallHandler((MethodCall methodCall) async {
       String method = methodCall.method;
       if (method == "openURLFromFlutter") {
         Map args = methodCall.arguments;
@@ -55,7 +55,7 @@ class Router extends Object {
       } else if (method == "popRouteNamed") {
         Router.sharedInstance().popRouteNamed(methodCall.arguments);
       } else {
-        HybridStackManagerPlugin.hybridStackManagerPlugin
+        return HybridStackManagerPlugin.hybridStackManagerPlugin
             .callFallbackHandler(methodCall);
       }
     });

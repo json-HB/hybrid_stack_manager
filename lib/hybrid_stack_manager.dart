@@ -23,9 +23,9 @@ class HybridStackManagerPlugin {
     _channel = new MethodChannel('hybrid_stack_manager');
   }
 
-  void callFallbackHandler(MethodCall methodCall) {
+  Future<dynamic> callFallbackHandler(MethodCall methodCall) async {
     if (_fallbackHandler != null) {
-      _fallbackHandler(methodCall);
+      return _fallbackHandler(methodCall);
     }
   }
 

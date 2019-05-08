@@ -59,8 +59,8 @@ public class HybridStackManager implements MethodCallHandler {
             assembleChanArgs(url, query, params));
     }
 
-    public void callFlutterMethod(String method, HashMap args) {
-      HybridStackManager.sharedInstance().methodChannel.invokeMethod(method, args);
+    public void callFlutterMethod(String method, HashMap args, MethodChannel.Result result) {
+      HybridStackManager.sharedInstance().methodChannel.invokeMethod(method, args, result);
     }
 
     @Override
