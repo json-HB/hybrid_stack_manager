@@ -26,13 +26,16 @@ public class XURLRouter {
     }
     public boolean openUrlWithQueryAndParams(String url, HashMap query, HashMap params) {
         Uri tmpUri = Uri.parse(url);
-        if (!kOpenUrlPrefix.equals(tmpUri.getScheme())) {
+        String scheme = tmpUri.getScheme();
+        if (scheme == null || !scheme.equals(kOpenUrlPrefix) && !scheme.startsWith("http")) {
             return false;
         }
-        if ("native".equals(tmpUri.getHost())) {
+        if (scheme.startsWith("http") || "native".equals(tmpUri.getHost())) {
             if (mNativeRouterHandler != null) {
                 mNativeRouterHandler.openUrlWithQueryAndParams(url, query, params);
                 return true;
+            } else {
+                return false;
             }
         } else {
             Intent intent = new Intent(mAppContext,FlutterWrapperActivity.class);
@@ -44,7 +47,6 @@ public class XURLRouter {
             mAppContext.startActivity(intent);
             return true;
         }
-        return false;
     }
     public void handleCallFromFlutter(Activity activity, Result result, String method, HashMap params) {
       if (mNativeRouterHandler != null) {
