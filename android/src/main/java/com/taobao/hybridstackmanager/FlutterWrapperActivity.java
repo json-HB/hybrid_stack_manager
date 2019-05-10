@@ -320,7 +320,11 @@ public class FlutterWrapperActivity extends Activity implements PluginRegistry,V
     public void openUrl(String url, HashMap query, HashMap params) {
         HybridStackManager.sharedInstance().curFlutterActivity = null;
         Uri tmpUri = Uri.parse(url);
-        if ("native".equals(tmpUri.getHost())) {
+        String scheme = tmpUri.getScheme();
+        if (scheme == null || !scheme.equals(XURLRouter.kOpenUrlPrefix) && !scheme.startsWith("http")) {
+            return;
+        }
+        if (scheme.startsWith("http") || "native".equals(tmpUri.getHost())) {
             XURLRouter.sharedInstance().openUrlWithQueryAndParams(url, query, params);
             saveFinishSnapshot(false);
         } else {
