@@ -7,13 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
+#import <Flutter/Flutter.h>
 #define kOpenUrlPrefix  @"hrd"
 
-typedef UIViewController* (^NativeOpenUrlHandler)(NSString *,NSDictionary *,NSDictionary *);
-void XOpenURLWithQueryAndParams(NSString *url,NSDictionary *query,NSDictionary *params);
+typedef void (^NativeOpenUrlHandler)(NSString *, NSDictionary *, NSDictionary *);
+typedef void (^NativeFlutterCallHandler)(FlutterResult , NSString *, NSDictionary *);
+
+void XOpenURLWithQueryAndParams(NSString *url, NSDictionary *query, NSDictionary *params);
 
 @interface XURLRouter : NSObject
-@property (nonatomic,weak) NativeOpenUrlHandler nativeOpenUrlHandler;
+@property (nonatomic, weak) NativeOpenUrlHandler nativeOpenUrlHandler;
+@property (nonatomic, weak) NativeFlutterCallHandler nativeFlutterCallHandler;
 + (instancetype)sharedInstance;
 @end

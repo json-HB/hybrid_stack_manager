@@ -10,7 +10,7 @@
 #import "XFlutterModule.h"
 
 @implementation XURLRouter
-+ (instancetype)sharedInstance{
++ (instancetype)sharedInstance {
     static XURLRouter *sInstance;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -20,20 +20,18 @@
 }
 @end
 
-void XOpenURLWithQueryAndParams(NSString *url,NSDictionary *query,NSDictionary *params){
+void XOpenURLWithQueryAndParams(NSString *url, NSDictionary *query,  NSDictionary *params) {
     NSURL *tmpUrl = [NSURL URLWithString:url];
     UINavigationController *rootNav = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
-    if(![kOpenUrlPrefix isEqualToString:tmpUrl.scheme])
+    if (![kOpenUrlPrefix isEqualToString:tmpUrl.scheme]) {
         return;
-    if([[query objectForKey:@"flutter"] boolValue]){
+    }
+    if ([[query objectForKey:@"flutter"] boolValue]) {
         [[XFlutterModule sharedInstance] openURL:url query:query params:params];
         return;
     }
     NativeOpenUrlHandler handler = [XURLRouter sharedInstance].nativeOpenUrlHandler;
-    if(handler!=nil)
-    {
-        UIViewController *vc = handler(url,query,params);
-        if(vc!=nil)
-            [rootNav pushViewController:vc animated:YES];
+    if (handler != nil) {
+        handler(url, query, params);
     }
 }
