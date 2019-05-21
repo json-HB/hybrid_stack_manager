@@ -30,7 +30,7 @@
     if ([@"openUrlFromNative" isEqualToString:call.method]) {
         NSDictionary *openUrlInfo = call.arguments;
         XOpenURLWithQueryAndParams(openUrlInfo[@"url"], openUrlInfo[@"query"], openUrlInfo[@"params"]);
-    } else if([@"getMainEntryParams" isEqualToString:call.method]) {
+    } else if ([@"getMainEntryParams" isEqualToString:call.method]) {
         NSDictionary *params = self.mainEntryParams?:@{};
         if ([[[UIDevice currentDevice] systemVersion] compare:@"9.0" options:NSNumericSearch] == NSOrderedAscending) {
             NSMutableDictionary *mutDict = [NSMutableDictionary dictionary];
@@ -39,7 +39,7 @@
         }
         result(params);
         //      self.mainEntryParams = nil;
-    } else if([@"updateCurPageFlutterRoute" isEqualToString:call.method]) {
+    } else if ([@"updateCurPageFlutterRoute" isEqualToString:call.method]) {
         NSString *curRouteName = call.arguments;
         UINavigationController *rootNav = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
         UIViewController *topVC = rootNav.topViewController;
@@ -47,7 +47,7 @@
             FlutterViewWrapperController *flutterVC = topVC;
             [flutterVC setCurFlutterRouteName:curRouteName];
         }
-    } else if([@"popCurPage" isEqualToString:call.method]) {
+    } else if ([@"popCurPage" isEqualToString:call.method]) {
         BOOL animated = YES;
         if (call.arguments && [call.arguments isKindOfClass:[NSNumber class]]) {
             animated = [(NSNumber *)call.arguments boolValue];
@@ -56,8 +56,8 @@
         if ([nav.topViewController isKindOfClass:[FlutterViewWrapperController class]]) {
             [nav popViewControllerAnimated:animated];
         }
-    } else if([@"callNativeMethod" isEqualToString:call.method]) {
-        // TODO
+    } else if ([@"callNativeMethod" isEqualToString:call.method]) {
+        [XURLRouter sharedInstance].nativeFlutterCallHandler(result, call.arguments[@"method"], call.arguments[@"params"]);
     } else {
         result(FlutterMethodNotImplemented);
     }
