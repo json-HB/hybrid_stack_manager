@@ -20,18 +20,17 @@
 }
 @end
 
-void XOpenURLWithQueryAndParams(NSString *url, NSDictionary *query,  NSDictionary *params) {
+void XOpenURLWithQueryAndParams(NSString *url, NSDictionary *query, NSDictionary *params) {
     NSURL *tmpUrl = [NSURL URLWithString:url];
-    UINavigationController *rootNav = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
-    if (![kOpenUrlPrefix isEqualToString:tmpUrl.scheme]) {
+    if (tmpUrl.scheme == nil || (![tmpUrl.scheme isEqualToString:kOpenUrlPrefix] && ![tmpUrl.scheme hasPrefix:@"http"])) {
         return;
     }
-    if ([[query objectForKey:@"flutter"] boolValue]) {
+    if ([tmpUrl.scheme hasPrefix:@"http"] || [@"native" isEqualToString:tmpUrl.host]) {
+        NativeOpenUrlHandler handler = [XURLRouter sharedInstance].nativeOpenUrlHandler;
+        if (handler != nil) {
+            handler(url, query, params);
+        }
+    } else {
         [[XFlutterModule sharedInstance] openURL:url query:query params:params];
-        return;
-    }
-    NativeOpenUrlHandler handler = [XURLRouter sharedInstance].nativeOpenUrlHandler;
-    if (handler != nil) {
-        handler(url, query, params);
     }
 }
