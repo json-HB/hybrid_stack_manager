@@ -23,9 +23,11 @@
     "Classes/*.{h,m}",
     "Classes/**/*.{h,m}"
   ],
-  "dependency": [
-    "Flutter"
-  ],
+  "dependencies": {
+    "Flutter": [
+
+    ]
+  },
   "exclude_files": "Classes/Exclude",
   "resources": "Resources/*",
   "prefix_header_contents": "",

@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 #define kOpenUrlPrefix  @"hrd"
 
 typedef UIViewController* (^NativeOpenUrlHandler)(NSString *,NSDictionary *,NSDictionary *);
