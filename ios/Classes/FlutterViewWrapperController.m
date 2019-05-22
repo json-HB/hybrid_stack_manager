@@ -90,6 +90,9 @@ typedef void (^FlutterWrapperHandleBlock)();
         [self saveSnapshot];
     }
     [[FlutterViewWrapperController flutterVC].view setUserInteractionEnabled:FALSE];
+    if (![rootNav.topViewController isKindOfClass:[FlutterViewWrapperController class]]) {
+        [self.navigationController setNavigationBarHidden:NO animated:NO];
+    }
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
