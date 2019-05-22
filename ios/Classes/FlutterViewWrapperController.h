@@ -14,6 +14,6 @@ typedef void (^FlutterViewWillAppearBlock) (void);
 
 @interface FlutterViewWrapperController : UIViewController
 + (XFlutterViewController *)flutterVC;
-@property(nonatomic,copy) NSString *curFlutterRouteName;
-@property(nonatomic,copy) FlutterViewWillAppearBlock viewWillAppearBlock;
+@property (nonatomic, copy) NSString *curFlutterRouteName;
+@property (nonatomic, copy) FlutterViewWillAppearBlock viewWillAppearBlock;
 @end

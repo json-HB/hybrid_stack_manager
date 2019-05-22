@@ -24,25 +24,27 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)viewWillAppear:(BOOL)animated{
-    if(self.enableViewWillAppear == FALSE)
+- (void)viewWillAppear:(BOOL)animated {
+    if (self.enableViewWillAppear == FALSE) {
         return;
+    }
     [super viewWillAppear:animated];
     self.enableViewWillAppear = FALSE;
 }
 
-- (void)viewDidAppear:(BOOL)animated{
+- (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
 }
 
-- (void)viewWillDisappear:(BOOL)animated{
+- (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
 }
 
-- (void)viewDidDisappear:(BOOL)animated{
+- (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     self.enableViewWillAppear = TRUE;
 }
+
 /*
  #pragma mark - Navigation
  

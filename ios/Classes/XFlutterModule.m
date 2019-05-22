@@ -8,10 +8,8 @@
 
 #import "XFlutterModule.h"
 #import "HybridStackManager.h"
-#import <hybrid_stack_manager/HybridStackManager.h>
 
-@interface XFlutterModule()
-{
+@interface XFlutterModule() {
     BOOL _isInFlutterRootPage;
     bool _isFlutterWarmedup;
 }
@@ -19,11 +17,13 @@
 
 @implementation XFlutterModule
 @synthesize isInFlutterRootPage = _isInFlutterRootPage;
+
 #pragma mark - XModuleProtocol
-+ (instancetype)sharedInstance{
++ (instancetype)sharedInstance {
     static XFlutterModule *sXFlutterModule;
-    if(sXFlutterModule)
+    if(sXFlutterModule) {
         return sXFlutterModule;
+    }
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sXFlutterModule = [[[self class] alloc] initInstance];
@@ -32,30 +32,32 @@
     return sXFlutterModule;
 }
 
-- (instancetype)initInstance{
-    if(self = [super init]){
+- (instancetype)initInstance {
+    self = [super init];
+    if (self) {
         _isInFlutterRootPage = TRUE;
     }
     return self;
 }
 
-- (XFlutterViewController *)flutterVC{
+- (XFlutterViewController *)flutterVC {
     return [FlutterViewWrapperController flutterVC];
 }
 
-- (void)warmupFlutter{
-    if(_isFlutterWarmedup)
+- (void)warmupFlutter {
+    if (_isFlutterWarmedup) {
         return;
+    }
     XFlutterViewController *flutterVC = [FlutterViewWrapperController flutterVC];
     [flutterVC view];
     [NSClassFromString(@"GeneratedPluginRegistrant") performSelector:NSSelectorFromString(@"registerWithRegistry:") withObject:flutterVC];
     _isFlutterWarmedup = true;
 }
 
-+ (NSDictionary *)parseParamsKV:(NSString *)aParamsStr{
++ (NSDictionary *)parseParamsKV:(NSString *)aParamsStr {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     NSArray *kvAry = [aParamsStr componentsSeparatedByString:@"&"];
-    for(NSString *kv in kvAry){
+    for (NSString *kv in kvAry) {
         NSArray *ary = [kv componentsSeparatedByString:@"="];
         if (ary.count == 2) {
             NSString *key = ary.firstObject;
@@ -66,7 +68,7 @@
     return dict;
 }
 
-- (void)openURL:(NSString *)aUrl query:(NSDictionary *)query params:(NSDictionary *)params{
+- (void)openURL:(NSString *)aUrl query:(NSDictionary *)query params:(NSDictionary *)params {
     static BOOL sIsFirstPush = TRUE;
     //Process aUrl and Query Stuff.
     NSURL *url = [NSURL URLWithString:aUrl];
@@ -82,7 +84,7 @@
     [arguments setValue:pageUrl forKey:@"url"];
     
     NSMutableDictionary *mutQuery = [NSMutableDictionary dictionary];
-    for(NSString *key in query.allKeys){
+    for (NSString *key in query.allKeys) {
         id value = [query objectForKey:key];
         //[TODO]: Add customized implementations for non-json-serializable objects into json-serializable ones.
         [mutQuery setValue:value forKey:key];
@@ -90,7 +92,7 @@
     [arguments setValue:mutQuery forKey:@"query"];
     
     NSMutableDictionary *mutParams = [NSMutableDictionary dictionary];
-    for(NSString *key in mParams.allKeys){
+    for (NSString *key in mParams.allKeys) {
         id value = [mParams objectForKey:key];
         //[TODO]: Add customized implementations for non-json-serializable objects into json-serializable ones.
         [mutParams setValue:value forKey:key];
@@ -102,13 +104,12 @@
     //Push
     UINavigationController *currentNavigation = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
     FlutterViewWrapperController *viewController = [[FlutterViewWrapperController alloc] initWithURL:[NSURL URLWithString:aUrl] query:query nativeParams:params];
-    viewController.viewWillAppearBlock = ^(){
+    viewController.viewWillAppearBlock = ^() {
         //Process first & later message sending according distinguishly.
-        if(sIsFirstPush){
+        if (sIsFirstPush) {
             [HybridStackManager sharedInstance].mainEntryParams = arguments;
             sIsFirstPush = FALSE;
-        }
-        else{
+        } else {
             [methodChann invokeMethod:@"openURLFromFlutter" arguments:arguments result:^(id  _Nullable result) {
             }];
         }

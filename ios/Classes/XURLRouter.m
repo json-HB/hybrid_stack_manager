@@ -12,6 +12,9 @@
 @implementation XURLRouter
 + (instancetype)sharedInstance {
     static XURLRouter *sInstance;
+    if (sInstance) {
+        return sInstance;
+    }
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sInstance = [XURLRouter new];

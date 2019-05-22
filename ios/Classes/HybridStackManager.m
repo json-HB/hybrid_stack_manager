@@ -9,7 +9,10 @@
 
 @implementation HybridStackManager
 + (instancetype)sharedInstance {
-    static HybridStackManager * sharedInst;
+    static HybridStackManager *sharedInst;
+    if (sharedInst) {
+        return sharedInst;
+    }
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInst = [[HybridStackManager alloc] init];
@@ -17,8 +20,8 @@
     return sharedInst;
 }
 
-+ (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    HybridStackManager* instance = [HybridStackManager sharedInstance];
++ (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
+    HybridStackManager *instance = [HybridStackManager sharedInstance];
     instance.methodChannel = [FlutterMethodChannel
                               methodChannelWithName:@"hybrid_stack_manager"
                               binaryMessenger:[registrar messenger]];
