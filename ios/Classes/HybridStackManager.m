@@ -59,6 +59,13 @@
         if ([nav.topViewController isKindOfClass:[FlutterViewWrapperController class]]) {
             [nav popViewControllerAnimated:animated];
         }
+    } else if ([@"toggleGestureBack" isEqualToString:call.method]) {
+        BOOL enable = YES;
+        if (call.arguments && [call.arguments isKindOfClass:[NSNumber class]]) {
+            enable = [(NSNumber *)call.arguments boolValue];
+        }
+        XFlutterViewController *flutterVC = [FlutterViewWrapperController flutterVC];
+        flutterVC.navigationController.interactivePopGestureRecognizer.enabled = enable;
     } else if ([@"callNativeMethod" isEqualToString:call.method]) {
         [XURLRouter sharedInstance].nativeFlutterCallHandler(result, call.arguments[@"method"], call.arguments[@"params"]);
     } else {

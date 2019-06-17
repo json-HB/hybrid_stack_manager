@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:async';
 import 'package:flutter/services.dart';
 
@@ -44,6 +45,12 @@ class HybridStackManagerPlugin {
 
   void updateCurPageFlutterRoute(String curRouteName) {
     _channel.invokeMethod("updateCurPageFlutterRoute", curRouteName ?? "");
+  }
+
+  void toggleGestureBack(bool enable) {
+    if (Platform.isIOS) {
+      _channel.invokeMethod("toggleGestureBack", enable);
+    }
   }
 
   Future callNativeMethod(String method, [Map params]) async {

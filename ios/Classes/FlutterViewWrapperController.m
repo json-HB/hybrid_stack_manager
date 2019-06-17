@@ -90,9 +90,10 @@ typedef void (^FlutterWrapperHandleBlock)();
         [self saveSnapshot];
     }
     [[FlutterViewWrapperController flutterVC].view setUserInteractionEnabled:FALSE];
-    if (![rootNav.topViewController isKindOfClass:[FlutterViewWrapperController class]]) {
-        [self.navigationController setNavigationBarHidden:NO animated:NO];
-    }
+    // TODO: 手势返回过程中标题栏有半透遮罩，暂时不处理
+    // if (![rootNav.topViewController isKindOfClass:[FlutterViewWrapperController class]]) {
+    //     [self.navigationController setNavigationBarHidden:NO animated:NO];
+    // }
 }
 
 - (void)viewDidDisappear:(BOOL)animated {

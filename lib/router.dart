@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'router_option.dart';
@@ -103,7 +104,16 @@ class Router extends Object {
           settings: new RouteSettings(name: routeOption.uniqueName),
           animated: animated,
           builder: (BuildContext context) {
-            return page;
+            if (Platform.isIOS) {
+              return WillPopScope(
+                onWillPop: () async {
+                  return false;
+                },
+                child: page,
+              );
+            } else {
+              return page;
+            }
           });
 
       _routeNameMap[routeOption.uniqueName] = pageRoute;

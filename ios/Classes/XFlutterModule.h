@@ -15,7 +15,6 @@
 - (instancetype)init __attribute__((unavailable("Must use sharedInstance instead.")));
 + (instancetype)sharedInstance;
 @property (nonatomic, assign) BOOL isInFlutterRootPage;
-@property (nonatomic, strong) XFlutterViewController *flutterVC;
 - (void)openURL:(NSString *)aUrl query:(NSDictionary *)query params:(NSDictionary *)params;
 - (void)warmupFlutter;
 @end
