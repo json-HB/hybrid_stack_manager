@@ -82,28 +82,13 @@
     FlutterMethodChannel *methodChann = [HybridStackManager sharedInstance].methodChannel;
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
     [arguments setValue:pageUrl forKey:@"url"];
-    
-    NSMutableDictionary *mutQuery = [NSMutableDictionary dictionary];
-    for (NSString *key in query.allKeys) {
-        id value = [query objectForKey:key];
-        //[TODO]: Add customized implementations for non-json-serializable objects into json-serializable ones.
-        [mutQuery setValue:value forKey:key];
-    }
-    [arguments setValue:mutQuery forKey:@"query"];
-    
-    NSMutableDictionary *mutParams = [NSMutableDictionary dictionary];
-    for (NSString *key in mParams.allKeys) {
-        id value = [mParams objectForKey:key];
-        //[TODO]: Add customized implementations for non-json-serializable objects into json-serializable ones.
-        [mutParams setValue:value forKey:key];
-    }
-    [arguments setValue:mutParams forKey:@"params"];
-    
+    [arguments setValue:mQuery forKey:@"query"];
+    [arguments setValue:mParams forKey:@"params"];
     [arguments setValue:@(0) forKey:@"animated"];
     
     //Push
     UINavigationController *currentNavigation = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
-    FlutterViewWrapperController *viewController = [[FlutterViewWrapperController alloc] initWithURL:[NSURL URLWithString:aUrl] query:query nativeParams:params];
+    FlutterViewWrapperController *viewController = [[FlutterViewWrapperController alloc] initWithURL:[NSURL URLWithString:aUrl] query:mQuery nativeParams:mParams];
     viewController.viewWillAppearBlock = ^() {
         //Process first & later message sending according distinguishly.
         if (sIsFirstPush) {
