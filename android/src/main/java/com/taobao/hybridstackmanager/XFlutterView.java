@@ -12,6 +12,9 @@ import android.util.AttributeSet;
 import java.lang.reflect.Field;
 import java.util.List;
 
+import io.flutter.embedding.engine.FlutterJNI;
+import io.flutter.embedding.engine.dart.DartExecutor;
+import io.flutter.embedding.engine.systemchannels.PlatformChannel;
 import io.flutter.plugin.common.ActivityLifecycleListener;
 import io.flutter.plugin.common.JSONMethodCodec;
 import io.flutter.plugin.common.MethodChannel;
@@ -77,9 +80,13 @@ public class XFlutterView extends FlutterView
                     privateField2.setAccessible(true);
                     List<ActivityLifecycleListener> mActivityLifecycleListener = (List<ActivityLifecycleListener>)privateField2.get(this);
                     mActivityLifecycleListener.clear();
-                    PlatformPlugin platformPlugin = new PlatformPlugin(activity);
+                    /* PlatformPlugin platformPlugin = new PlatformPlugin(activity);
                     MethodChannel flutterPlatformChannel = new MethodChannel(this, "flutter/platform", JSONMethodCodec.INSTANCE);
-                    flutterPlatformChannel.setMethodCallHandler(platformPlugin);
+                    flutterPlatformChannel.setMethodCallHandler(platformPlugin); */
+                    FlutterJNI jni = new FlutterJNI();
+                    DartExecutor dartExecutor = new DartExecutor(jni);
+                    PlatformChannel channel = new PlatformChannel(dartExecutor);
+                    PlatformPlugin platformPlugin = new PlatformPlugin(activity, channel);
                     addActivityLifecycleListener(platformPlugin);
                 } catch (NoSuchFieldException e) {
                     e.printStackTrace();
