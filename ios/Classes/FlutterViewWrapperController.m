@@ -20,9 +20,28 @@ typedef void (^FlutterWrapperHandleBlock)();
 @property (nonatomic, strong) UIImageView *fakeSnapImgView;
 @property (nonatomic, strong) UIImage *lastSnapshot;
 @property (nonatomic, copy) NSString *lastFlutterRouteName;
+
+
+//新增（wayne）
+@property (nonatomic, strong) UIImageView *loadingImageView;
 @end
 
 @implementation FlutterViewWrapperController
+
+#pragma mark - loadingView
+- (UIImageView *)loadingImageView
+{
+    if (_loadingImageView == nil) {
+        UIWindow *window = [UIApplication sharedApplication].keyWindow;
+        _loadingImageView = [[UIImageView alloc] initWithFrame:CGRectMake((window.bounds.size.width-60)/2, (window.bounds.size.height-60-64)/2, 60, 60)];
+        NSString *path = [[NSBundle mainBundle] pathForResource:@"loading" ofType:@"gif"];
+        NSData *data = [NSData dataWithContentsOfFile:path];
+        UIImage *image = [UIImage sd_imageWithGIFData:data];
+        _loadingImageView.image = image;
+    }
+    return _loadingImageView;
+}
+
 #pragma mark - LifeCycle
 - (instancetype)initWithURL:(NSURL *)url query:(NSDictionary *)query nativeParams:(NSDictionary *)nativeParams {
     self = [super initWithURL:url query:query nativeParams:nativeParams];
@@ -70,6 +89,14 @@ typedef void (^FlutterWrapperHandleBlock)();
             [self addChildFlutterVC];
         });
     }
+    
+    [self.view addSubview:self.loadingImageView];
+    [self performSelector:@selector(removeLoadingImageView) withObject:nil afterDelay:10];
+}
+
+- (void)removeLoadingImageView
+{
+    [self.loadingImageView removeFromSuperview];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
