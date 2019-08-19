@@ -10,6 +10,7 @@
 #import "FlutterViewWrapperController.h"
 #import "HybridStackManager.h"
 
+#import "UIImage+GIF.h"
 typedef NS_ENUM(NSInteger, FlutterVCSwitchCategory) {
     FlutterVCSwitchCategoryOK,
 };
