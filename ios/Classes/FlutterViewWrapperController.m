@@ -22,6 +22,11 @@ typedef void (^FlutterWrapperHandleBlock)();
 @property (nonatomic, strong) UIImage *lastSnapshot;
 @property (nonatomic, copy) NSString *lastFlutterRouteName;
 
+//add screen white bug fix
+
+@property(nonatomic,weak) id<UIGestureRecognizerDelegate> originalGestureDelegate;
+
+
 
 //新增（wayne）
 @property (nonatomic, strong) UIImageView *loadingImageView;
@@ -80,7 +85,15 @@ typedef void (^FlutterWrapperHandleBlock)();
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.navigationController setNavigationBarHidden:YES animated:NO];
+    
+//    [self.navigationController setNavigationBarHidden:YES animated:NO];
+    
+    //add screen white bug fix
+    self.navigationController.navigationBarHidden = TRUE;
+    self.originalGestureDelegate = self.navigationController.interactivePopGestureRecognizer.delegate;
+    self.navigationController.interactivePopGestureRecognizer.delegate = self;
+
+    
     if (self.viewWillAppearBlock) {
         self.viewWillAppearBlock();
         self.viewWillAppearBlock = nil;
@@ -112,6 +125,10 @@ typedef void (^FlutterWrapperHandleBlock)();
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     UINavigationController *rootNav = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
+    //add screen white bug fix
+    rootNav.interactivePopGestureRecognizer.delegate = self.originalGestureDelegate;
+
+    
     NSArray *curStackAry = rootNav.viewControllers;
     NSInteger idx = [curStackAry indexOfObject:self];
     if (idx != NSNotFound && idx != curStackAry.count - 1) {
@@ -207,4 +224,14 @@ typedef void (^FlutterWrapperHandleBlock)();
     });
     return sxFlutterVC;
 }
+
+#pragma mark - UIGestureRecognizerDelegate
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer{
+    return TRUE;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldBeRequiredToFailByGestureRecognizer:(nonnull UIGestureRecognizer *)otherGestureRecognizer{
+    return TRUE;
+}
+
 @end
