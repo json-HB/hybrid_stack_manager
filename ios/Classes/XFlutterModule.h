@@ -8,13 +8,15 @@
 
 #import <Foundation/Foundation.h>
 #import <Flutter/Flutter.h>
-#import "FlutterViewWrapperController.h"
 
 @interface XFlutterModule : NSObject
 + (instancetype)new __attribute__((unavailable("Must use sharedInstance instead.")));
 - (instancetype)init __attribute__((unavailable("Must use sharedInstance instead.")));
 + (instancetype)sharedInstance;
 @property (nonatomic, assign) BOOL isInFlutterRootPage;
+@property (nonatomic,strong) FlutterEngine *flutterEngine;
 - (void)openURL:(NSString *)aUrl query:(NSDictionary *)query params:(NSDictionary *)params;
+- (XFlutterViewController *)queryFlutterVCWithURL:(NSString *)url query:(NSDictionary *)query params:(NSDictionary *)params;
+
 - (void)warmupFlutter;
 @end

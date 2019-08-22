@@ -8,6 +8,7 @@
 
 #import "XFlutterModule.h"
 #import "HybridStackManager.h"
+#import <hybrid_stack_manager/HybridStackManager.h>
 
 @interface XFlutterModule() {
     BOOL _isInFlutterRootPage;
@@ -41,16 +42,15 @@
 }
 
 - (XFlutterViewController *)flutterVC {
-    return [FlutterViewWrapperController flutterVC];
+    return [XFlutterViewController flutterVC];
 }
 
 - (void)warmupFlutter {
-    if (_isFlutterWarmedup) {
+    if(_isFlutterWarmedup)
         return;
-    }
-    XFlutterViewController *flutterVC = [FlutterViewWrapperController flutterVC];
-    [flutterVC view];
-    [NSClassFromString(@"GeneratedPluginRegistrant") performSelector:NSSelectorFromString(@"registerWithRegistry:") withObject:flutterVC];
+    _flutterEngine = [[FlutterEngine alloc] initWithName:@"default_engine" project:nil];
+    [_flutterEngine runWithEntrypoint:nil];
+    [NSClassFromString(@"GeneratedPluginRegistrant") performSelector:NSSelectorFromString(@"registerWithRegistry:") withObject:_flutterEngine];
     _isFlutterWarmedup = true;
 }
 
@@ -69,38 +69,63 @@
 }
 
 - (void)openURL:(NSString *)aUrl query:(NSDictionary *)query params:(NSDictionary *)params {
+    
+    XFlutterViewController *flutterWrapperVC = [self  queryFlutterVCWithURL:aUrl query:query params:params];
+    //Push
+    UINavigationController *currentNavigation = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
+    [currentNavigation pushViewController:flutterWrapperVC animated:YES];
+}
+- (XFlutterViewController *)queryFlutterVCWithURL:(NSString *)url query:(NSDictionary *)query params:(NSDictionary *)params{
     static BOOL sIsFirstPush = TRUE;
     //Process aUrl and Query Stuff.
-    NSURL *url = [NSURL URLWithString:aUrl];
+    NSURL *aUrl = [NSURL URLWithString:url];
     
     NSMutableDictionary *mQuery = [NSMutableDictionary dictionaryWithDictionary:query];
-    [mQuery addEntriesFromDictionary:[XFlutterModule parseParamsKV:url.query]];
+    [mQuery addEntriesFromDictionary:[XFlutterModule parseParamsKV:aUrl.query]];
     NSMutableDictionary *mParams = [NSMutableDictionary dictionaryWithDictionary:params];
-    [mParams addEntriesFromDictionary:[XFlutterModule parseParamsKV:url.parameterString]];
-    NSString *pageUrl = [NSString stringWithFormat:@"%@://%@",url.scheme,url.host];
+    [mParams addEntriesFromDictionary:[XFlutterModule parseParamsKV:aUrl.parameterString]];
+    NSString *pageUrl = [NSString stringWithFormat:@"%@://%@",aUrl.scheme,aUrl.host];
     
     FlutterMethodChannel *methodChann = [HybridStackManager sharedInstance].methodChannel;
     NSMutableDictionary *arguments = [NSMutableDictionary dictionary];
     [arguments setValue:pageUrl forKey:@"url"];
-    [arguments setValue:mQuery forKey:@"query"];
-    [arguments setValue:mParams forKey:@"params"];
-    [arguments setValue:@(0) forKey:@"animated"];
     
-    //Push
-    UINavigationController *currentNavigation = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
-    FlutterViewWrapperController *viewController = [[FlutterViewWrapperController alloc] initWithURL:[NSURL URLWithString:aUrl] query:mQuery nativeParams:mParams];
-    viewController.viewWillAppearBlock = ^() {
+    NSMutableDictionary *mutQuery = [NSMutableDictionary dictionary];
+    for(NSString *key in query.allKeys){
+        id value = [query objectForKey:key];
+        //[TODO]: Add customized implementations for non-json-serializable objects into json-serializable ones.
+        [mutQuery setValue:value forKey:key];
+    }
+    [arguments setValue:mutQuery forKey:@"query"];
+    
+    NSMutableDictionary *mutParams = [NSMutableDictionary dictionary];
+    for(NSString *key in mParams.allKeys){
+        id value = [mParams objectForKey:key];
+        //[TODO]: Add customized implementations for non-json-serializable objects into json-serializable ones.
+        [mutParams setValue:value forKey:key];
+    }
+    [arguments setValue:mutParams forKey:@"params"];
+    
+    [arguments setValue:@(0) forKey:@"animated"];
+    if(sIsFirstPush){
+        [HybridStackManager sharedInstance].mainEntryParams = arguments;
+        sIsFirstPush = FALSE;
+    }
+    NSLog(@"_flutterEngine---%@",_flutterEngine);
+    
+    XFlutterViewController *viewController = [[XFlutterViewController alloc] initWithEngine:_flutterEngine nibName:nil bundle:nil];
+    
+    viewController.viewWillAppearBlock = ^(){
         //Process first & later message sending according distinguishly.
-        if (sIsFirstPush) {
-            [HybridStackManager sharedInstance].mainEntryParams = arguments;
-            sIsFirstPush = FALSE;
-        } else {
+        
+        if(!sIsFirstPush){
             [methodChann invokeMethod:@"openURLFromFlutter" arguments:arguments result:^(id  _Nullable result) {
             }];
+        }else{
+            NSLog(@"sIsFirstPush----%@",sIsFirstPush?@"YES":@"NO");
         }
     };
-    [currentNavigation pushViewController:viewController animated:YES]; 
+    return viewController;
 }
-
 #pragma mark - XFlutterModuleProtocol
 @end

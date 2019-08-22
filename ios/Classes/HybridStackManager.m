@@ -1,6 +1,5 @@
 #import <sys/utsname.h>
 #import "HybridStackManager.h"
-#import "FlutterViewWrapperController.h"
 #import "XURLRouter.h"
 
 @interface HybridStackManager()
@@ -46,8 +45,8 @@
         NSString *curRouteName = call.arguments;
         UINavigationController *rootNav = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
         UIViewController *topVC = rootNav.topViewController;
-        if ([topVC isKindOfClass:[FlutterViewWrapperController class]]) {
-            FlutterViewWrapperController *flutterVC = topVC;
+        if([topVC isKindOfClass:[XFlutterViewController class]]){
+            XFlutterViewController *flutterVC = (XFlutterViewController *)topVC;
             [flutterVC setCurFlutterRouteName:curRouteName];
         }
     } else if ([@"popCurPage" isEqualToString:call.method]) {
@@ -56,7 +55,7 @@
             animated = [(NSNumber *)call.arguments boolValue];
         }
         UINavigationController *nav = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
-        if ([nav.topViewController isKindOfClass:[FlutterViewWrapperController class]]) {
+        if(nav.viewControllers.count>1 && [nav.topViewController isKindOfClass:[XFlutterViewController class]]){
             [nav popViewControllerAnimated:animated];
         }
     } else if ([@"toggleGestureBack" isEqualToString:call.method]) {
@@ -64,7 +63,7 @@
         if (call.arguments && [call.arguments isKindOfClass:[NSNumber class]]) {
             enable = [(NSNumber *)call.arguments boolValue];
         }
-        XFlutterViewController *flutterVC = [FlutterViewWrapperController flutterVC];
+        XFlutterViewController *flutterVC = [XFlutterViewController flutterVC];
         flutterVC.navigationController.interactivePopGestureRecognizer.enabled = enable;
     } else if ([@"callNativeMethod" isEqualToString:call.method]) {
         [XURLRouter sharedInstance].nativeFlutterCallHandler(result, call.arguments[@"method"], call.arguments[@"params"]);
