@@ -230,7 +230,7 @@ public class FlutterWrapperActivity extends Activity implements PluginRegistry,V
         super.onStop();
         if(super.isFinishing()){
             HybridStackManager.sharedInstance().methodChannel.invokeMethod("popRouteNamed",curFlutterRouteName);
-            if (priorParent == rootView) {
+            if (flutterView != null && priorParent == rootView) {
                 priorParent.removeView(flutterView);
             }
         }
