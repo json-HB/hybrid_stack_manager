@@ -87,8 +87,13 @@
     [arguments setValue:@(0) forKey:@"animated"];
     
     //Push
-    UINavigationController *currentNavigation = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
+//    UINavigationController *currentNavigation = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
+    
+    UITabBarController *tabVC = (UITabBarController*)[UIApplication sharedApplication].delegate.window.rootViewController;
+    UINavigationController *currentNavigation = (UINavigationController *)tabVC.viewControllers[tabVC.selectedIndex];
+    
     FlutterViewWrapperController *viewController = [[FlutterViewWrapperController alloc] initWithURL:[NSURL URLWithString:aUrl] query:mQuery nativeParams:mParams];
+    
     viewController.viewWillAppearBlock = ^() {
         //Process first & later message sending according distinguishly.
         if (sIsFirstPush) {

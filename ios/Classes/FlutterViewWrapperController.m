@@ -111,7 +111,12 @@ typedef void (^FlutterWrapperHandleBlock)();
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    UINavigationController *rootNav = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
+//    UINavigationController *rootNav = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
+    
+    
+    UINavigationController *rootNav = [self getRootNav];
+    
+    
     NSArray *curStackAry = rootNav.viewControllers;
     NSInteger idx = [curStackAry indexOfObject:self];
     if (idx != NSNotFound && idx != curStackAry.count - 1) {
@@ -126,7 +131,10 @@ typedef void (^FlutterWrapperHandleBlock)();
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
-    UINavigationController *rootNav = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
+//    UINavigationController *rootNav = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
+    
+    UINavigationController *rootNav = [self getRootNav];
+    
     NSArray *ary = [rootNav.viewControllers filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *, id> * _Nullable bindings) {
         if ([evaluatedObject isKindOfClass:[FlutterViewWrapperController class]]) {
             return TRUE;
@@ -206,5 +214,12 @@ typedef void (^FlutterWrapperHandleBlock)();
         sxFlutterVC = [[XFlutterViewController alloc] initWithProject:nil nibName:nil bundle:nil];
     });
     return sxFlutterVC;
+}
+
+- (UINavigationController *)getRootNav
+{
+    UITabBarController *tabVC = (UITabBarController*)[UIApplication sharedApplication].delegate.window.rootViewController;
+    UINavigationController *rootNav = (UINavigationController *)tabVC.viewControllers[tabVC.selectedIndex];
+    return rootNav;
 }
 @end

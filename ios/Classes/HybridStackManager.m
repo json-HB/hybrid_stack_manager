@@ -44,8 +44,14 @@
         //      self.mainEntryParams = nil;
     } else if ([@"updateCurPageFlutterRoute" isEqualToString:call.method]) {
         NSString *curRouteName = call.arguments;
-        UINavigationController *rootNav = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
+//        UINavigationController *rootNav = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
+//        UIViewController *topVC = rootNav.topViewController;
+        
+        
+        UITabBarController *tabVC = (UITabBarController*)[UIApplication sharedApplication].delegate.window.rootViewController;
+        UINavigationController *rootNav = (UINavigationController *)tabVC.viewControllers[tabVC.selectedIndex];
         UIViewController *topVC = rootNav.topViewController;
+        
         if ([topVC isKindOfClass:[FlutterViewWrapperController class]]) {
             FlutterViewWrapperController *flutterVC = topVC;
             [flutterVC setCurFlutterRouteName:curRouteName];
@@ -55,7 +61,12 @@
         if (call.arguments && [call.arguments isKindOfClass:[NSNumber class]]) {
             animated = [(NSNumber *)call.arguments boolValue];
         }
-        UINavigationController *nav = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
+        
+//        UINavigationController *nav = (UINavigationController*)[UIApplication sharedApplication].delegate.window.rootViewController;
+        
+        UITabBarController *tabVC = (UITabBarController*)[UIApplication sharedApplication].delegate.window.rootViewController;
+        UINavigationController *nav = (UINavigationController *)tabVC.viewControllers[tabVC.selectedIndex];
+        
         if ([nav.topViewController isKindOfClass:[FlutterViewWrapperController class]]) {
             [nav popViewControllerAnimated:animated];
         }
